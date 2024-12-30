@@ -2,7 +2,7 @@ ENVIRONMENT = 'development'
 
 
 # UI设置
-UI_TITTLE = "TBK-ParamManager"
+UI_TITTLE = "Client"
 UI_WIDTH = 1920
 UI_HEIGHT = 1080
 UI_THEME = "dark"
@@ -19,3 +19,6 @@ BOX_POS_OFFSET = 20
 
 # LOG设置
 UI_LOG_DIR = "logs/ui_logs"
+
+# ROS设置
+VCHISEL_WS_DIR = "../vChisel_ws/"
