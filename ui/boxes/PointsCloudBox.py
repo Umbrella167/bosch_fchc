@@ -6,43 +6,55 @@ import os
 import subprocess
 import signal
 import psutil
-
+import pyvista as pv
+import numpy as np
+import threading
 class PointsCloudBox(BaseBox):
     only = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.ros_process = None  # 用于存储启动的进程
-
     def create(self):
         dpg.configure_item(self.tag, label="PointsCloud Box")
         with dpg.group(horizontal=True, parent=self.tag):
             dpg.add_button(label="Start", width=100, height=100, callback=self.start)
             dpg.add_button(label="Close", width=100, height=100, callback=self.close)
 
+        points = np.random.rand(100, 3) # 随机生成100个3维点
+        self.point_cloud = pv.PolyData(points)
+
+        self.plotter = pv.Plotter(off_screen=True)
+
+
+    def draw_thread(self):
+        pass
     def start(self):
-        try:
-            if self.ros_process is not None:
-                client_logger.log("ROS process is already running.")
-                return
+        image = self.plotter.screenshot()
+        print(image)
+        pass
+        # try:
+        #     if self.ros_process is not None:
+        #         client_logger.log("ROS process is already running.")
+        #         return
 
-            # 启动 norm_viewer 并记录进程信息
-            cmd = f"bash -c 'cd {VCHISEL_WS_DIR} && source devel/setup.sh && roslaunch norm_calc norm_viewer.launch'"
+        #     # 启动 norm_viewer 并记录进程信息
+        #     cmd = f"bash -c 'cd {VCHISEL_WS_DIR} && source devel/setup.sh && roslaunch norm_calc norm_viewer.launch'"
 
-            self.ros_process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                shell=True,
-                preexec_fn=os.setsid  # 为子进程创建新的会话组
-            )
+        #     self.ros_process = subprocess.Popen(
+        #         cmd,
+        #         stdout=subprocess.PIPE,
+        #         stderr=subprocess.PIPE,
+        #         shell=True,
+        #         preexec_fn=os.setsid  # 为子进程创建新的会话组
+        #     )
             
-            client_logger.log("success", "Started ROS process successfully.")
-        except subprocess.TimeoutExpired:
-            client_logger.log("info", "Process started, but no immediate output.")
-        except Exception as e:
-            client_logger.log("error",f"Failed to start ROS process: {e}")
-            self.ros_process = None
+        #     client_logger.log("success", "Started ROS process successfully.")
+        # except subprocess.TimeoutExpired:
+        #     client_logger.log("info", "Process started, but no immediate output.")
+        # except Exception as e:
+        #     client_logger.log("error",f"Failed to start ROS process: {e}")
+        #     self.ros_process = None
 
     def close(self):
         try:

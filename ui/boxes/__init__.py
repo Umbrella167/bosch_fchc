@@ -22,6 +22,8 @@ modules_to_import = [
     ("ui.boxes.ParamBox", "ParamBox"),
     ("ui.boxes.PointsCloudBox", "PointsCloudBox"),
     ("ui.boxes.ModbusBox", "ModbusBox"),
+    ("ui.boxes.OutPutBox", "OutPutBox"),
+
 
 
 

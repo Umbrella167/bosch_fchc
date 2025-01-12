@@ -8,7 +8,7 @@ import os
 roscore_process = None  # 全局变量，用于存储 roscore 的进程信息
 
 def start_roscore():
-    global roscore_process  # 声明为全局变量
+    global roscore_process  
     try:
         # 启动 roscore 并记录进程信息
         roscore_process = subprocess.Popen(['roscore'], preexec_fn=os.setsid)
@@ -16,7 +16,7 @@ def start_roscore():
         print("Failed to start roscore:", e)
 
 def stop_roscore():
-    global roscore_process  # 声明为全局变量
+    global roscore_process  
     if roscore_process:
         try:
             # 终止 roscore 进程
@@ -32,7 +32,6 @@ def loop(UI):
         UI.update()
     except Exception as e:
         client_logger.log("ERROR", f"Loop Failed!", e)
-
 def main():
     try:
         # 启动 roscore

@@ -32,6 +32,7 @@ class UI:
         )
         dpg.setup_dearpygui()
         dpg.show_viewport()
+        
         self.create_viewport_menu()
         # self.ui_data = get_ui_data()
         self.console_box = self.add_ConsoleBox(ui=self)

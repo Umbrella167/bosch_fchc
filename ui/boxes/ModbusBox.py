@@ -1,6 +1,4 @@
 import subprocess
-import os
-import signal
 import dearpygui.dearpygui as dpg
 from ui.boxes.BaseBox import BaseBox
 from utils.ClientLogManager import client_logger
@@ -12,19 +10,24 @@ class ModbusBox(BaseBox):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
+   
     def create(self):
         dpg.configure_item(self.tag, label="Modbus Box")
-        with dpg.group(horizontal=True, parent=self.tag):
-            dpg.add_button(label="Start", width=100, height=100, callback=self.start)
-            dpg.add_button(label="Close", width=100, height=100, callback=self.close)
-
+        dpg.add_text("Modbus:", parent=self.tag)
+        with dpg.child_window(label="Modbus",parent=self.tag, auto_resize_x=True,auto_resize_y=True):
+            with dpg.group(horizontal=True):
+                dpg.add_button(label="Start", width=100, height=70, callback=self.start)
+                dpg.add_button(label="Close", width=100, height=70, callback=self.close)
+                
     def start(self):
         # 构建命令
         cmd = f"cd {VCHISEL_WS_DIR} && source devel/setup.sh && roslaunch modbus Core.launch"
+        # cmd = f"cd {VCHISEL_WS_DIR} && source devel/setup.sh && /bin/python $(which roslaunch) modbus Core.launch"
         try:
             # 打开一个新的终端并运行命令，保存进程对象
+            
             self.process = subprocess.Popen(["gnome-terminal", "--", "bash", "-c", cmd])
+
         except Exception as e:
             client_logger.log("error",f"Failed to start terminal: {e}")
     def kill_ros_processes(self):
@@ -36,8 +39,8 @@ class ModbusBox(BaseBox):
                     cmdline = process.info['cmdline']
                     if cmdline and any("ros" in arg for arg in cmdline):
                         client_logger.log("info", f"Killing ROS process: {cmdline}")
-                        process.terminate()  # 尝试优雅地终止进程
-                        process.wait(timeout=5)  # 等待进程终止
+                        process.terminate()  
+                        process.wait(timeout=5)  
                         if process.is_running():  # 如果进程仍在运行，则强制杀死
                             process.kill()
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
@@ -47,8 +50,6 @@ class ModbusBox(BaseBox):
             client_logger.log("info", "All ROS processes terminated successfully.")
         except Exception as e:
             client_logger.log("error", f"Failed to terminate ROS processes: {e}")
-
-
     def close(self):
         self.kill_ros_processes()
         # 强制关闭终端及其子进程
