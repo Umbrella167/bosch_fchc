@@ -23,10 +23,6 @@ modules_to_import = [
     ("ui.boxes.PointsCloudBox", "PointsCloudBox"),
     ("ui.boxes.ModbusBox", "ModbusBox"),
     ("ui.boxes.OutPutBox", "OutPutBox"),
-
-
-
-
 ]
 
 # 尝试导入每个模块，并将其绑定到全局命名空间

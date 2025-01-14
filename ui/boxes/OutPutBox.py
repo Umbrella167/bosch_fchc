@@ -17,7 +17,14 @@ class OutPutBox(BaseBox):
                         callback=self.f_msg
                     )
         
-        self.info_all = ""
+        self.COLOR_MAP = {
+            "ERROR": (220, 53, 69, 100),   # 柔和的红色
+            "DEBUG": (23, 162, 184, 100), # 柔和的蓝绿色
+            "INFO": (40, 167, 69, 100),   # 柔和的绿色
+            "WARN": (255, 193, 7, 100),   # 柔和的黄色
+            "FATAL": (111, 66, 193, 100)  # 柔和的紫色
+        }
+        self.msg_count = 0
     def f_msg(self, msg):
         print(msg)
         # 提取关键字段
@@ -38,20 +45,44 @@ class OutPutBox(BaseBox):
         function = msg.function  # 触发日志的函数
         line = msg.line  # 行号
         topics = ", ".join(msg.topics)  # 订阅的主题
-
-        # 构建格式化日志字符串
-        formatted_log = (
-            f"[{timestamp}] [{log_level}] [{name}] {message}\n"
-            f"    File: {file_name}, Function: {function}, Line: {line}\n"
-            f"    Topics: {topics}\n"
-        )
-        self.info_all += formatted_log + "\n"
-        dpg.set_value(self.input_text, self.info_all)
+        self.add_msg(line,timestamp,log_level,name,message,file_name,function,topics)
     def create(self):
         dpg.configure_item(self.tag, label="OutPutBox")
-        self.input_text = dpg.add_input_text( parent=self.tag,multiline=True, height=-1, width=-1)
-
-
+        self.create_table()
+        
+    def create_table(self):
+        self.table_tag = dpg.add_table(
+            header_row=True,
+            policy=dpg.mvTable_SizingFixedFit,
+            row_background=True,
+            reorderable=True,
+            resizable=True,
+            no_host_extendX=False,
+            hideable=True,
+            borders_innerV=True,
+            delay_search=True,
+            borders_outerV=True,
+            borders_innerH=True,
+            borders_outerH=True,
+            parent=self.tag,
+            height= -1,
+            width=-1,
+        )
+        info = ["Index","Line", "Timestamp", "Level", "Name", "Message", "File", "Function", "Topics"]
+        for t in info:
+            dpg.add_table_column(label=t, width_fixed=True, parent=self.table_tag)
+    def add_msg(self, line,timestamp,log_level,name,message,file_name,function,topics):
+        infos = [self.msg_count,line,timestamp,log_level,name,message,file_name,function,topics]
+        color = self.COLOR_MAP[log_level]
+        row_tag = dpg.add_table_row(parent=self.table_tag)
+        for count,info in enumerate(infos):
+            dpg.add_selectable(label=info, span_columns=True, parent=row_tag,tracked = True,track_offset = 1.0)
+        dpg.highlight_table_row(self.table_tag,self.msg_count , color)
+        dpg.set_y_scroll(self.table_tag, self.msg_count * 1000)
+        self.msg_count += 1
+        
     def destroy(self):
-        # 在销毁时提示用户关闭终端
         super().destroy()
+        
+    def update(self):
+        pass

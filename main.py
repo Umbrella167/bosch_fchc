@@ -1,10 +1,9 @@
-import rospy
+# import rospy
 from ui.Ui import UI  # 确保路径正确
 from utils.ClientLogManager import client_logger
 import subprocess
 import signal
 import os
-
 roscore_process = None  # 全局变量，用于存储 roscore 的进程信息
 
 def start_roscore():
